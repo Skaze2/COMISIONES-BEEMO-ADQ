@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Comisiones vFinal</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        /* Contenedor Principal */
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            min-width: 300px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.4rem;
+        }
+
+        /* TABLA DE REFERENCIA */
+        .ref-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        .ref-table th {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+        }
+
+        .ref-table td {
+            border-bottom: 1px solid #eee;
+            padding: 8px;
+            color: #555;
+        }
+
+        .active-row {
+            background-color: #ffe600 !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        /* FORMULARIO */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        /* BOTONES */
+        button.primary-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #ffe600;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        button.primary-btn:hover {
+            background-color: #e6cf00;
+        }
+
+        button.secondary-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+        }
+
+        button.secondary-btn:hover {
+            background-color: #555;
+        }
+
+        /* RESULTADOS */
+        .result-box {
+            margin-top: 20px;
+            display: none;
+            border-top: 2px solid #ffe600;
+            padding-top: 15px;
+        }
+
+        .result-section {
+            background: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .date-label {
+            font-size: 0.85em;
+            color: #d35400;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .info-text {
+            font-size: 0.75em;
+            color: #777;
+            text-align: right;
+            font-style: italic;
+        }
+
+        /* Estilo especial para sección base */
+        .base-salary-section {
+            background-color: #e8f8f5 !important;
+            /* Verde suave */
+            border: 1px solid #2ecc71 !important;
+        }
+
+        .base-date-label {
+            color: #27ae60 !important;
+        }
+
+        /* Badge informativo */
+        .badge-mode {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .badge-max {
+            background-color: #ffe600;
+            color: #000;
+        }
+
+        .badge-table {
+            background-color: #eee;
+            color: #555;
+        }
+
+        /* SECCIÓN DE EJEMPLOS */
+        .examples-container {
+            width: 100%;
+            max-width: 1000px;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .scroll-table-container {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+
+        .example-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+
+        .example-table th {
+            position: sticky;
+            top: 0;
+            background: #2c3e50;
+            color: white;
+            padding: 10px;
+            z-index: 2;
+        }
+
+        .example-table td {
+            border-bottom: 1px solid #eee;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+
+        .special-yellow-row {
+            background-color: #ffe600 !important;
+            color: black !important;
+            font-weight: bold;
+            border: 2px solid #d4ac0d;
+        }
+
+        /* Colores Bases de Marcación */
+        .base-general {
+            background-color: #ff9800 !important;
+            color: white !important;
+        }
+
+        /* Naranja */
+        .base-master {
+            background-color: #2196f3 !important;
+            color: white !important;
+        }
+
+        /* Azul */
+        .base-premium {
+            background-color: #4caf50 !important;
+            color: white !important;
+        }
+
+        /* Verde */
+
+        #baseMarcacion {
+            transition: background-color 0.3s, color 0.3s;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+
+        <div class="card">
+            <h2>Tabla de Comisiones</h2>
+            <p style="text-align:center; font-size:0.8rem; color:#666; margin-bottom:10px;">
+                Tabla de Comisiones Escalona
+            </p>
+            <table class="ref-table">
+                <thead>
+                    <tr>
+                        <th>Ventas</th>
+                        <th>1era Cuota</th>
+                        <th>2da Cuota</th>
+                        <th>Bonos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="row-55">
+                        <td>55 - 1000</td>
+                        <td>40%</td>
+                        <td>28%</td>
+                        <td>$500</td>
+                    </tr>
+                    <tr id="row-46">
+                        <td>46 - 54</td>
+                        <td>35%</td>
+                        <td>21%</td>
+                        <td>$400</td>
+                    </tr>
+                    <tr id="row-40">
+                        <td>40 - 45</td>
+                        <td>30%</td>
+                        <td>18%</td>
+                        <td>$350</td>
+                    </tr>
+                    <tr id="row-34">
+                        <td>34 - 39</td>
+                        <td>25%</td>
+                        <td>15%</td>
+                        <td>$300</td>
+                    </tr>
+                    <tr id="row-28">
+                        <td>28 - 33</td>
+                        <td>20%</td>
+                        <td>12%</td>
+                        <td>$250</td>
+                    </tr>
+                    <tr id="row-20">
+                        <td>20 - 27</td>
+                        <td>15%</td>
+                        <td>9%</td>
+                        <td>$200</td>
+                    </tr>
+                    <tr id="row-16">
+                        <td>16 - 19</td>
+                        <td style="color: #d35400; font-weight:bold;">10%</td>
+                        <td>0%</td>
+                        <td>$0</td>
+                    </tr>
+                    <tr id="row-0">
+                        <td>0 - 15</td>
+                        <td>0%</td>
+                        <td>0%</td>
+                        <td>$0</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h2>Calculadora de Pagos</h2>
+
+            <div class="form-group">
+                <label for="mes">Mes de la Venta (Vencido)</label>
+                <select id="mes">
+                    <option value="0">Enero</option>
+                    <option value="1">Febrero</option>
+                    <option value="2">Marzo</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Mayo</option>
+                    <option value="5">Junio</option>
+                    <option value="6">Julio</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Septiembre</option>
+                    <option value="9">Octubre</option>
+                    <option value="10">Noviembre</option>
+                    <option value="11">Diciembre</option>
+                </select>
+            </div>
+
+            <div class="form-group" id="contenedorFechaBase"
+                style="background: #f0f0f0; padding: 10px; border-radius: 5px;">
+                <label for="fechaInicioContrato">Fecha de Ciclo (Inicio):</label>
+                <input type="date" id="fechaInicioContrato">
+                <small style="color: #666;">Selecciona el primer día de trabajo para calcular el sueldo ponderado ($500
+                    base).</small>
+            </div>
+
+            <div class="form-group">
+                <label for="baseMarcacion">BASE DE MARCACION</label>
+                <select id="baseMarcacion" onchange="actualizarFacturado()" class="base-general">
+                    <option value="32" class="base-general">Ticket Promedio $32 USD</option>
+                    <option value="45" class="base-master">Ticket Promedio $45 USD</option>
+                    <option value="54" class="base-premium">Ticket Promedio $54 USD</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="cantidadVentas">Unidades Vendidas</label>
+                <input type="number" id="cantidadVentas" placeholder="Ej: 42" min="0" oninput="actualizarFacturado()">
+            </div>
+            <div class="form-group">
+                <label for="usdFacturados">Total USD Facturados (Automático)</label>
+                <input type="number" id="usdFacturados" placeholder="0.00" step="0.01" min="0" readonly
+                    style="background-color: #e9ecef;">
+            </div>
+
+            <button class="primary-btn" onclick="calcular()">Calcular Total</button>
+
+            <div id="resultado" class="result-box">
+
+                <div id="modeBadge" style="text-align:center;">
+                    <span class="badge-mode badge-table">Modo: Sueldo Fijo ($500) + Comisiones</span>
+                </div>
+
+                <div id="resBaseSection" class="result-section base-salary-section" style="display:none;">
+                    <div class="result-row">
+                        <span>💵 Salario Base (Ponderado):</span>
+                        <span id="resMontoBase" class="highlight">-</span>
+                    </div>
+                    <span class="date-label base-date-label">📅 PAGO: <span id="resFechaBase">-</span></span>
+                    <div class="info-text">Se paga los primeros 5 días del mes siguiente.</div>
+                </div>
+
+                <div class="result-section" style="background-color: #fffbe6;">
+                    <div class="result-row">
+                        <span>1era Cuota Comisión (<span id="resPorc1">0%</span>):</span>
+                        <span id="resMonto1" class="highlight">-</span>
+                    </div>
+                    <span class="date-label">📅 PAGO: <span id="resFecha1">-</span></span>
+                    <div class="info-text">Se paga el 15 del mes siguiente.</div>
+                </div>
+
+                <div class="result-section" style="background-color: #e8f6ff;">
+                    <div class="result-row">
+                        <span>2da Cuota Comisión (<span id="resPorc2">0%</span>):</span>
+                        <span id="resMonto2" class="highlight">-</span>
+                    </div>
+                    <span class="date-label">📅 PAGO: <span id="resFecha2">-</span></span>
+                    <div class="info-text">Se paga 30 días después del 1er pago.</div>
+                </div>
+
+                <div class="result-section" style="background-color: #ebf5fb; border-left: 5px solid #3498db;">
+                    <div class="result-row">
+                        <span>🎁 Bono por Meta Alcanzada:</span>
+                        <span id="resMontoBono" class="highlight">-</span>
+                    </div>
+                    <span class="date-label">📅 PAGO: <span id="resFechaBono">-</span></span>
+                    <div class="info-text">Se paga junto con la 1era cuota (día 15).</div>
+                </div>
+
+                <div style="text-align: right; margin-top: 10px; font-size: 1.1em; color: #333;">
+                    Total a Recibir: <strong id="resTotalGlobal">-</strong>
+                </div>
+            </div>
+
+            <button class="secondary-btn" onclick="toggleEjemplos()">Desplegar ejemplos del primer mes 👇</button>
+        </div>
+    </div>
+
+    <div id="ejemplosBox" class="examples-container">
+        <h3 style="text-align: center; color: #333;">Escenarios Incentivo "Nuevo Agente" (Primer Mes)</h3>
+        <p style="text-align: center; color: #666; font-size: 0.9rem; margin-bottom: 15px;">
+            Ticket Promedio fijo $35 USD | Comisión Máxima (40% + 28%).
+        </p>
+        <div class="scroll-table-container">
+            <table class="example-table">
+                <thead>
+                    <tr>
+                        <th># Ventas</th>
+                        <th>Facturado</th>
+                        <th>1era Cuota</th>
+                        <th>2da Cuota</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaEjemplosBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function actualizarFacturado() {
+            const selectBases = document.getElementById('baseMarcacion');
+            const base = parseFloat(selectBases.value);
+            const ventas = parseInt(document.getElementById('cantidadVentas').value) || 0;
+            const total = base * ventas;
+            document.getElementById('usdFacturados').value = total.toFixed(2);
+
+            // Actualizar color del selector
+            selectBases.className = ''; // Limpiar clases
+            if (base === 32) selectBases.classList.add('base-general');
+            else if (base === 45) selectBases.classList.add('base-master');
+            else if (base === 54) selectBases.classList.add('base-premium');
+        }
+
+        function calcular() {
+            const mesIndex = parseInt(document.getElementById('mes').value);
+            const ventas = parseInt(document.getElementById('cantidadVentas').value);
+            const usd = parseFloat(document.getElementById('usdFacturados').value);
+
+            document.querySelectorAll('.ref-table tr').forEach(row => row.classList.remove('active-row'));
+
+            if (isNaN(ventas) || isNaN(usd)) { alert("Ingresa ventas y monto USD."); return; }
+
+            let porc1 = 0, porc2 = 0, bono = 0, rowId = "";
+
+            // --- LÓGICA DE TABLA ESCALONADA Y BONOS ---
+
+            if (ventas >= 55) { porc1 = 40; porc2 = 28; bono = 500; rowId = "row-55"; }
+            else if (ventas >= 46) { porc1 = 35; porc2 = 21; bono = 400; rowId = "row-46"; }
+            else if (ventas >= 40) { porc1 = 30; porc2 = 18; bono = 350; rowId = "row-40"; }
+            else if (ventas >= 34) { porc1 = 25; porc2 = 15; bono = 300; rowId = "row-34"; }
+            else if (ventas >= 28) { porc1 = 20; porc2 = 12; bono = 250; rowId = "row-28"; }
+            else if (ventas >= 20) { porc1 = 15; porc2 = 9; bono = 200; rowId = "row-20"; }
+            else if (ventas >= 16) { porc1 = 10; porc2 = 0; bono = 0; rowId = "row-16"; }
+            else { porc1 = 0; porc2 = 0; bono = 0; rowId = "row-0"; }
+
+            if (rowId) document.getElementById(rowId).classList.add('active-row');
+
+            const comision1 = usd * (porc1 / 100);
+            const comision2 = usd * (porc2 / 100);
+
+            // --- LÓGICA SALARIO BASE (Ponderado) ---
+            let montoBase = 0;
+            let fechaPagoBaseTexto = "-";
+            const sectionBase = document.getElementById('resBaseSection');
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const anioActual = new Date().getFullYear();
+
+            if (true) { // Siempre tiene base ahora
+                const fechaInputStr = document.getElementById('fechaInicioContrato').value;
+                if (!fechaInputStr) { alert("Selecciona fecha inicio del ciclo para pagar el sueldo."); return; }
+
+                const fechaInicio = new Date(fechaInputStr + 'T00:00:00');
+                const ultimoDiaMes = new Date(anioActual, mesIndex + 1, 0).getDate();
+                const fechaFinMes = new Date(anioActual, mesIndex, ultimoDiaMes);
+                const fechaInicioMes = new Date(anioActual, mesIndex, 1);
+                const SALARIO_FULL = 500; // Valor fijo siempre
+
+                if (fechaInicio > fechaFinMes) { montoBase = 0; }
+                else if (fechaInicio < fechaInicioMes) { montoBase = SALARIO_FULL; }
+                else {
+                    const diasTrabajados = ultimoDiaMes - fechaInicio.getDate() + 1;
+                    montoBase = (SALARIO_FULL / ultimoDiaMes) * diasTrabajados;
+                }
+
+                let mesPagoIndex = mesIndex + 1;
+                let anioPago = "";
+                if (mesPagoIndex > 11) { mesPagoIndex = 0; anioPago = " (Año Sig)"; }
+                fechaPagoBaseTexto = `1 al 5 de ${meses[mesPagoIndex]}${anioPago}`;
+                sectionBase.style.display = 'block';
+            }
+
+            // --- FECHAS COMISIONES ---
+            let i1 = (mesIndex + 1) % 12;
+            let anio1 = (mesIndex + 1 > 11) ? " (Año Sig)" : "";
+            let i2 = (mesIndex + 2) % 12;
+            let anio2 = (mesIndex + 2 > 11) ? " (Año Sig)" : "";
+
+            // --- RENDERIZADO ---
+            const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+
+            document.getElementById('resMontoBase').innerText = formatter.format(montoBase);
+            document.getElementById('resFechaBase').innerText = fechaPagoBaseTexto;
+
+            document.getElementById('resPorc1').innerText = porc1 + "%";
+            document.getElementById('resMonto1').innerText = formatter.format(comision1);
+            document.getElementById('resFecha1').innerText = `15 de ${meses[i1]}${anio1}`;
+
+            document.getElementById('resPorc2').innerText = porc2 + "%";
+            document.getElementById('resMonto2').innerText = formatter.format(comision2);
+            document.getElementById('resFecha2').innerText = `15 de ${meses[i2]}${anio2}`;
+
+            document.getElementById('resMontoBono').innerText = formatter.format(bono);
+            document.getElementById('resFechaBono').innerText = `15 de ${meses[i1]}${anio1}`;
+
+            const totalGlobal = montoBase + comision1 + comision2 + bono;
+            document.getElementById('resTotalGlobal').innerText = formatter.format(totalGlobal);
+
+            document.getElementById('resultado').style.display = 'block';
+        }
+
+        // --- LÓGICA EJEMPLOS ---
+        let tablaGenerada = false;
+        function toggleEjemplos() {
+            const box = document.getElementById('ejemplosBox');
+            if (box.style.display === 'block') { box.style.display = 'none'; return; }
+            box.style.display = 'block';
+            if (!tablaGenerada) { generarTablaEjemplos(); tablaGenerada = true; }
+            box.scrollIntoView({ behavior: 'smooth' });
+        }
+        function generarTablaEjemplos() {
+            const tbody = document.getElementById('tablaEjemplosBody');
+            const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
+            const TICKET_FIJO = 35;
+            let html = "";
+            for (let i = 1; i <= 100; i++) {
+                const facturado = i * TICKET_FIJO;
+                const c1 = facturado * 0.40;
+                const c2 = facturado * 0.28;
+                const total = c1 + c2;
+                const claseFila = (i === 32) ? 'class="special-yellow-row"' : '';
+                html += `<tr ${claseFila}><td>${i}</td><td>${formatter.format(facturado)}</td>
+                     <td>${formatter.format(c1)}</td><td>${formatter.format(c2)}</td>
+                     <td><strong>${formatter.format(total)}</strong></td></tr>`;
+            }
+            tbody.innerHTML = html;
+            setTimeout(() => { const row32 = document.querySelector('.special-yellow-row'); if (row32) row32.scrollIntoView({ block: "center" }); }, 300);
+        }
+    </script>
+
+</body>
+
+</html>
